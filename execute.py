@@ -42,6 +42,7 @@ class Executor(object):
         if trace.error:
             self.register_error_in_history()
             errors.value += 1
+
         self.depth = 0
         for line in trace.instructions:
             if isinstance(line, nodes.Assignment):
@@ -55,13 +56,13 @@ class Executor(object):
                 raise NotImplementedError()
         update_frontier(self.hist, self.path, self.sym_vars, trace.error)
         paths = PersistentVariable("paths")
+        completed = PersistentVariable("complete")
         if not paths.value:
-            completed = PersistentVariable("complete")
             completed.value = True
             sys.exit(1)
-        print("PATHS:", paths.value)
         newest_path, newest_history = paths.value.pop()
         export_to_input(newest_path, INPUT)
+        PersistentVariable("inputs").value.add(tuple(sorted(newest_path)))
         path.write_path(PICKLE, newest_history)
 
     def executeAssignment(self, line):
