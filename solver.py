@@ -67,8 +67,8 @@ def solve_constraints(branch_history, constraints, variables):
         j -= 1
     return True
 
-def update_frontier(branch_history, constraints, variables, error):
 
+def update_frontier(branch_history, constraints, variables, insert_first):
     paths = PersistentVariable("paths")
     j = len(branch_history) - 1
     temp = []
@@ -90,7 +90,7 @@ def update_frontier(branch_history, constraints, variables, error):
                 # else:
                 #     print("discarding", solution)
         j -= 1
-    if error:
+    if insert_first:
         paths.value.extend(temp[::-1])  # process nearest branch first
     else:
         paths.value.extendleft(temp[::-1])  # process the faraway ones first

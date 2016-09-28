@@ -11,6 +11,7 @@ TRACE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "trace.tx"
 TARGET_PATH = "/Users/nzhang-dev/Documents/Fall16/CS294-15/cute/hw1/"
 PICKLE = os.path.join(TARGET_PATH, "history.pickle")
 INPUT = os.path.join(TARGET_PATH, "input")
+THRESHOLD = os.environ.get("THRESHOLD", 10)
 
 class Executor(object):
 
@@ -44,18 +45,21 @@ class Executor(object):
             errors.value += 1
 
         self.depth = 0
+        new_branches = 0
         for line in trace.instructions:
             if isinstance(line, nodes.Assignment):
                 self.executeAssignment(line)
             elif isinstance(line, nodes.Conditional):
                 self.executeConditional(line)
+                if line.id not in branches.value:
+                    new_branches += 1
                 branches.value.add(line.id)
             elif isinstance(line, nodes.SymbolicWrite):
                 self.executeSymbolic(line)
             else:
                 raise NotImplementedError()
         # print("inputs:", PersistentVariable("inputs").value)
-        update_frontier(self.hist, self.path, self.sym_vars, trace.error)
+        update_frontier(self.hist, self.path, self.sym_vars, new_branches > THRESHOLD)
         paths = PersistentVariable("paths")
         completed = PersistentVariable("complete")
         if not paths.value:
