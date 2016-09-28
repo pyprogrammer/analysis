@@ -1,6 +1,6 @@
 from __future__ import print_function
 from textx.metamodel import metamodel_from_file
-from solver import solve_constraints, export_to_input
+from solver import update_frontier, export_to_input
 from util import PersistentVariable
 import nodes
 import path
@@ -53,14 +53,16 @@ class Executor(object):
                 self.executeSymbolic(line)
             else:
                 raise NotImplementedError()
-        sol = solve_constraints(self.hist, self.path, self.sym_vars)
-        if sol is True:
+        update_frontier(self.hist, self.path, self.sym_vars, trace.error)
+        paths = PersistentVariable("paths")
+        if not paths.value:
             completed = PersistentVariable("complete")
             completed.value = True
             sys.exit(1)
-        sol, self.hist = sol
-        export_to_input(sol, INPUT)
-        path.write_path(PICKLE, self.hist)
+        print("PATHS:", paths.value)
+        newest_path, newest_history = paths.value.pop()
+        export_to_input(newest_path, INPUT)
+        path.write_path(PICKLE, newest_history)
 
     def executeAssignment(self, line):
         if isinstance(line.rvalue, nodes.Value):

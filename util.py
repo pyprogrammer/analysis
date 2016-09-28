@@ -1,4 +1,5 @@
 import atexit
+import os
 import pickle
 
 class PersistentVariable(object):
@@ -40,3 +41,10 @@ class PersistentVariable(object):
     def _store(cls):
         with open(cls.__persistence_name, "w") as loadfile:
             pickle.dump(cls.__variables, loadfile)
+
+    @classmethod
+    def clear(cls):
+        try:
+            os.remove(cls.__persistence_name)
+        except OSError:
+            pass

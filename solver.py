@@ -1,4 +1,7 @@
 import subprocess
+from collections import deque
+
+from util import PersistentVariable
 
 import path
 
@@ -63,6 +66,34 @@ def solve_constraints(branch_history, constraints, variables):
                 return solution, branch_history[:j+1]
         j -= 1
     return True
+
+def update_frontier(branch_history, constraints, variables, error):
+
+    paths = PersistentVariable("paths")
+    j = len(branch_history) - 1
+    temp = []
+    while j >= 0:
+        if not branch_history[j].done:
+            branch_history[j] = path.HistoryElement(branch_history[j].branch, not branch_history[j].type,
+                                                    branch_history[j].type)
+            solve_constraint_params = [
+                constraint for id, type, constraint in constraints
+            ][:j+1]
+            if isinstance(solve_constraint_params[j], bool):
+                j -= 1
+                continue
+            solve_constraint_params[j] = solve_constraint_params[j].negate()
+            solution = path_constraint_to_solution(solve_constraint_params, variables)
+            if solution:
+                temp.append((solution, branch_history[:j+1]))
+        j -= 1
+    print(temp)
+    if error:
+        paths.value.extend(temp[::-1])  # process nearest branch first
+    else:
+        paths.value.extendleft(temp[::-1])  # process the faraway ones first
+
+
 
 def export_to_input(assignments, filename):
     with open(filename, "w") as f:
