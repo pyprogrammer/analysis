@@ -1,0 +1,84 @@
+Trace:
+    instructions *= Instruction
+    error?=Error
+;
+
+Instruction:
+    SymbolicWrite|Assignment|Conditional
+;
+
+SymbolicWrite:
+    "(" address=Address ",_)" "=" "(" type=Type ")" "(" var=ID ",_)"
+;
+
+Type:
+    "int"|"long"|"short"|"byte"|"byte"|"char"|"boolean"
+;
+
+Assignment:
+    lvalue=Value "=" rvalue=RValue
+;
+
+Value:
+    "(" address=Address "," value=AddressValue ")"
+;
+
+Address:
+    INT|ID
+;
+
+AddressValue:
+    INT|FLOAT|"_"
+;
+
+RValue:
+    BinaryOp|UnaryOp|Value
+;
+
+BinaryOp:
+    left=Value op=bOp right=Value
+;
+
+bOp:
+   "+"|"-"|"*"|"/"|"%"|UnknownOp
+;
+
+UnaryOp:
+    op=uOp val=Value
+;
+
+uOp:
+    "-"|UnknownOp
+;
+
+Conditional:
+    btype=BranchType ":" id=INT val=BranchValue
+;
+
+BranchType:
+    "else"|"then"
+;
+
+BranchValue:
+    BOOL|Comparison|UnknownCond
+;
+
+Comparison:
+    left=Value op=ComparisonOp right=Value
+;
+
+ComparisonOp:
+    "<="|"<"|">="|">"|"=="|"!="|UnknownOp
+;
+
+UnknownCond:
+    op=UnknownOp value=Value
+;
+
+UnknownOp:
+    /[a-zA-Z0-9<>]+/
+;
+
+Error:
+    "error"
+;
