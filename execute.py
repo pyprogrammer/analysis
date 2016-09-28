@@ -54,6 +54,7 @@ class Executor(object):
                 self.executeSymbolic(line)
             else:
                 raise NotImplementedError()
+        # print("inputs:", PersistentVariable("inputs").value)
         update_frontier(self.hist, self.path, self.sym_vars, trace.error)
         paths = PersistentVariable("paths")
         completed = PersistentVariable("complete")
@@ -62,7 +63,7 @@ class Executor(object):
             sys.exit(1)
         newest_path, newest_history = paths.value.pop()
         export_to_input(newest_path, INPUT)
-        PersistentVariable("inputs").value.add(tuple(sorted(newest_path)))
+        PersistentVariable("inputs").value.add(tuple(sorted(newest_path.items())))
         path.write_path(PICKLE, newest_history)
 
     def executeAssignment(self, line):

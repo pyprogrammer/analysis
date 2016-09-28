@@ -1,6 +1,6 @@
 import atexit
 import os
-import pickle
+import cPickle as pickle
 
 class PersistentVariable(object):
     __variables = {}

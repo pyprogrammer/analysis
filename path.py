@@ -1,5 +1,5 @@
 import collections
-import pickle
+import cPickle as pickle
 
 HistoryElement = collections.namedtuple("HistoryElement", ["branch", "type", "done"])
 

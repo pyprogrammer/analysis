@@ -85,8 +85,10 @@ def update_frontier(branch_history, constraints, variables, error):
             solve_constraint_params[j] = solve_constraint_params[j].negate()
             solution = path_constraint_to_solution(solve_constraint_params, variables)
             if solution:
-                if tuple(sorted(solution)) not in PersistentVariable("inputs").value:
+                if tuple(sorted(solution.items())) not in PersistentVariable("inputs").value:
                     temp.append((solution, branch_history[:j+1]))
+                # else:
+                #     print("discarding", solution)
         j -= 1
     if error:
         paths.value.extend(temp[::-1])  # process nearest branch first
